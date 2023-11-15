@@ -72,6 +72,14 @@ public class TicketValidatorTest {
     }
 
     @Test
+    public void validateExceptionWhenNullPassedInToTicketRequestsField() {
+        InvalidPurchaseException invalidPurchaseException = assertThrows(InvalidPurchaseException.class, () ->
+                ticketValidator.validateTicketRequest(1L, null));
+
+        assertEquals(NULL_TICKET_REQUEST_MESSAGE, invalidPurchaseException.getMessage(), INVALID_EXCEPTION_MESSAGE);
+    }
+
+    @Test
     public void validateExceptionWhenTicketRequestedWithoutRequestType() {
         TicketTypeRequest[] ticketTypeRequests = {
                 new TicketTypeRequest(TicketTypeRequest.Type.ADULT, 15),

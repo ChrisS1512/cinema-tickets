@@ -41,22 +41,19 @@ public class TicketValidatorImpl implements TicketValidator {
             throw new InvalidPurchaseException("Total requested tickets must be between 1 and 20");
         }
 
-        long adultTickets = Arrays.stream(ticketTypeRequests)
-                .filter(ticketTypeRequest -> ticketTypeRequest.getTicketType().equals(TicketTypeRequest.Type.ADULT))
-                .count();
+        boolean noAdultTickets = Arrays.stream(ticketTypeRequests)
+                .noneMatch(ticketTypeRequest -> ticketTypeRequest.getTicketType().equals(TicketTypeRequest.Type.ADULT));
 
-        if (adultTickets == 0) {
+        if (noAdultTickets) {
             throw new InvalidPurchaseException("At least one adult ticket must be purchased");
         }
     }
 
     private void validateTicketIndividualRequestCount(TicketTypeRequest... ticketTypeRequests) throws InvalidPurchaseException {
-        long negativeTicketCount = Arrays.stream(ticketTypeRequests)
-                .map(TicketTypeRequest::getNoOfTickets)
-                .filter(ticketNum -> ticketNum <= 0)
-                .count();
+        boolean negativeTicketCount = Arrays.stream(ticketTypeRequests)
+                .anyMatch(ticketTypeRequest -> ticketTypeRequest.getNoOfTickets() <= 0);
 
-        if (negativeTicketCount > 0) {
+        if (negativeTicketCount) {
             throw new InvalidPurchaseException("Each ticket request must have a request count >= 1");
         }
     }
@@ -68,11 +65,10 @@ public class TicketValidatorImpl implements TicketValidator {
     }
 
     private void validateTicketRequestType(TicketTypeRequest... ticketTypeRequests) throws InvalidPurchaseException {
-        long nullTicketType = Arrays.stream(ticketTypeRequests)
-                .filter(ticketTypeRequest -> ticketTypeRequest.getTicketType() == null)
-                .count();
+        boolean nullRequestTypes = Arrays.stream(ticketTypeRequests)
+                .anyMatch(ticketTypeRequest -> ticketTypeRequest.getTicketType() == null);
 
-        if (nullTicketType > 0) {
+        if (nullRequestTypes) {
             throw new InvalidPurchaseException("Each ticket request must have a ticket request type");
         }
     }
