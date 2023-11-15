@@ -4,6 +4,8 @@ import org.junit.jupiter.api.Test;
 import uk.gov.dwp.uc.pairtest.domain.TicketTypeRequest;
 import uk.gov.dwp.uc.pairtest.exception.InvalidPurchaseException;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -23,7 +25,7 @@ public class TicketValidatorTest {
     public void validateExceptionWhenNoAccountId() {
         TicketTypeRequest ticketTypeRequest = new TicketTypeRequest(TicketTypeRequest.Type.ADULT, 2);
         InvalidPurchaseException invalidPurchaseException = assertThrows(InvalidPurchaseException.class, () ->
-                ticketValidator.validateTicketRequest(null, ticketTypeRequest));
+                ticketValidator.validateTicketRequest(null, List.of(ticketTypeRequest)));
 
         assertEquals(INVALID_ID_MESSAGE, invalidPurchaseException.getMessage(), INVALID_EXCEPTION_MESSAGE);
     }
@@ -32,17 +34,17 @@ public class TicketValidatorTest {
     public void validateExceptionWhenInvalidAccountId() {
         TicketTypeRequest ticketTypeRequest = new TicketTypeRequest(TicketTypeRequest.Type.ADULT, 2);
         InvalidPurchaseException invalidPurchaseException = assertThrows(InvalidPurchaseException.class, () ->
-                ticketValidator.validateTicketRequest(0L, ticketTypeRequest));
+                ticketValidator.validateTicketRequest(0L, List.of(ticketTypeRequest)));
 
         assertEquals(INVALID_ID_MESSAGE, invalidPurchaseException.getMessage(), INVALID_EXCEPTION_MESSAGE);
     }
 
     @Test
     public void validateExceptionWhenGreaterThanMaxTickets() {
-        TicketTypeRequest[] ticketTypeRequests = {
+        List<TicketTypeRequest> ticketTypeRequests = List.of(
                 new TicketTypeRequest(TicketTypeRequest.Type.ADULT, 15),
                 new TicketTypeRequest(TicketTypeRequest.Type.CHILD, 8)
-        };
+        );
 
         InvalidPurchaseException invalidPurchaseException = assertThrows(InvalidPurchaseException.class, () ->
                 ticketValidator.validateTicketRequest(1L, ticketTypeRequests));
@@ -52,7 +54,7 @@ public class TicketValidatorTest {
 
     @Test
     public void validateExceptionWhenNoTicketsRequested() {
-        TicketTypeRequest[] ticketTypeRequests = {};
+        List<TicketTypeRequest> ticketTypeRequests = List.of();
 
         InvalidPurchaseException invalidPurchaseException = assertThrows(InvalidPurchaseException.class, () ->
                 ticketValidator.validateTicketRequest(1L, ticketTypeRequests));
@@ -62,10 +64,10 @@ public class TicketValidatorTest {
 
     @Test
     public void validateExceptionWhenTicketRequestedWithoutRequestType() {
-        TicketTypeRequest[] ticketTypeRequests = {
+        List<TicketTypeRequest> ticketTypeRequests = List.of(
                 new TicketTypeRequest(TicketTypeRequest.Type.ADULT, 15),
                 new TicketTypeRequest(null, 4)
-        };
+        );
 
         InvalidPurchaseException invalidPurchaseException = assertThrows(InvalidPurchaseException.class, () ->
                 ticketValidator.validateTicketRequest(1L, ticketTypeRequests));
@@ -75,10 +77,10 @@ public class TicketValidatorTest {
 
     @Test
     public void validateExceptionWhenTicketRequestedWithInvalidRequestCount() {
-        TicketTypeRequest[] ticketTypeRequests = {
+        List<TicketTypeRequest> ticketTypeRequests = List.of(
                 new TicketTypeRequest(TicketTypeRequest.Type.ADULT, 4),
                 new TicketTypeRequest(TicketTypeRequest.Type.INFANT, 0)
-        };
+        );
 
         InvalidPurchaseException invalidPurchaseException = assertThrows(InvalidPurchaseException.class, () ->
                 ticketValidator.validateTicketRequest(1L, ticketTypeRequests));
@@ -88,10 +90,10 @@ public class TicketValidatorTest {
 
     @Test
     public void validateExceptionWhenNoAdultTicketsPurchased() {
-        TicketTypeRequest[] ticketTypeRequests = {
+        List<TicketTypeRequest> ticketTypeRequests = List.of(
                 new TicketTypeRequest(TicketTypeRequest.Type.INFANT, 2),
                 new TicketTypeRequest(TicketTypeRequest.Type.CHILD, 8)
-        };
+        );
 
         InvalidPurchaseException invalidPurchaseException = assertThrows(InvalidPurchaseException.class, () ->
                 ticketValidator.validateTicketRequest(1L, ticketTypeRequests));

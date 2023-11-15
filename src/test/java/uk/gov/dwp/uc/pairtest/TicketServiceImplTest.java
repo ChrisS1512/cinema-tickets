@@ -11,6 +11,8 @@ import thirdparty.seatbooking.SeatReservationService;
 import uk.gov.dwp.uc.pairtest.domain.TicketTypeRequest;
 import uk.gov.dwp.uc.pairtest.exception.InvalidPurchaseException;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.eq;
@@ -43,7 +45,7 @@ public class TicketServiceImplTest {
         TicketTypeRequest ticketTypeRequest = new TicketTypeRequest(TicketTypeRequest.Type.ADULT, 4);
 
         doThrow(new InvalidPurchaseException(TEST_EXCEPTION_MESSAGE)).when(ticketValidator)
-                .validateTicketRequest(1L, ticketTypeRequest);
+                .validateTicketRequest(1L, List.of(ticketTypeRequest));
 
         InvalidPurchaseException invalidPurchaseException = assertThrows(InvalidPurchaseException.class, () ->
                 ticketService.purchaseTickets(1L, ticketTypeRequest), "No exception thrown");

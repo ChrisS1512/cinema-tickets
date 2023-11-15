@@ -16,11 +16,12 @@ public class TicketValidatorImpl implements TicketValidator {
      * @param ticketTypeRequests The ticket requests to validate.
      * @throws InvalidPurchaseException Thrown with an appropriate error message if validation fails.
      */
-    public void validateTicketRequest(Long accountId, TicketTypeRequest... ticketTypeRequests) throws InvalidPurchaseException {
+    @Override
+    public void validateTicketRequest(Long accountId, List<TicketTypeRequest> ticketTypeRequests) throws InvalidPurchaseException {
         validateAccountId(accountId);
-        validateTicketRequestType(List.of(ticketTypeRequests));
-        validateTicketIndividualRequestCount(List.of(ticketTypeRequests));
-        validateTicketTotalRequestCount(List.of(ticketTypeRequests));
+        validateTicketRequestType(ticketTypeRequests);
+        validateTicketIndividualRequestCount(ticketTypeRequests);
+        validateTicketTotalRequestCount(ticketTypeRequests);
     }
 
     private void validateAccountId(Long accountId) throws InvalidPurchaseException {
@@ -34,7 +35,7 @@ public class TicketValidatorImpl implements TicketValidator {
                 .mapToInt(TicketTypeRequest::getNoOfTickets)
                 .sum();
 
-        if (totalTickets <=0 || totalTickets > 20) {
+        if (totalTickets <= 0 || totalTickets > 20) {
             throw new InvalidPurchaseException("Total requested tickets must be between 1 and 20");
         }
 

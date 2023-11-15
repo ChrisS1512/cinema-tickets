@@ -22,6 +22,10 @@ public class TicketTypeRequest {
         return type;
     }
 
+    /**
+     * Calculates the total ticket cost, based on the type of ticket and number.
+     * @return The cost of the ticket.
+     */
     public int calculateTicketCost() {
         return type.ticketCost * noOfTickets;
     }
