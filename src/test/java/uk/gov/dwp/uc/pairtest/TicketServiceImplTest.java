@@ -42,13 +42,13 @@ public class TicketServiceImplTest {
 
     @Test
     public void testExceptionIsThrownWhenTicketValidationFails() {
-        TicketTypeRequest ticketTypeRequest = new TicketTypeRequest(TicketTypeRequest.Type.ADULT, 4);
+        TicketTypeRequest[] ticketTypeRequests = { new TicketTypeRequest(TicketTypeRequest.Type.ADULT, 4) };
 
         doThrow(new InvalidPurchaseException(TEST_EXCEPTION_MESSAGE)).when(ticketValidator)
-                .validateTicketRequest(1L, List.of(ticketTypeRequest));
+                .validateTicketRequest(1L, ticketTypeRequests);
 
         InvalidPurchaseException invalidPurchaseException = assertThrows(InvalidPurchaseException.class, () ->
-                ticketService.purchaseTickets(1L, ticketTypeRequest), "No exception thrown");
+                ticketService.purchaseTickets(1L, ticketTypeRequests), "No exception thrown");
 
         assertEquals(TEST_EXCEPTION_MESSAGE, invalidPurchaseException.getMessage(),
                 "Invalid exception message displayed");

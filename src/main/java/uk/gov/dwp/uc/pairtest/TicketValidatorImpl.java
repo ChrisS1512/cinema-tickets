@@ -3,7 +3,8 @@ package uk.gov.dwp.uc.pairtest;
 import uk.gov.dwp.uc.pairtest.domain.TicketTypeRequest;
 import uk.gov.dwp.uc.pairtest.exception.InvalidPurchaseException;
 
-import java.util.List;
+import java.util.Arrays;
+import java.util.Objects;
 
 /**
  * Class which handles the validation for tickets
@@ -17,8 +18,9 @@ public class TicketValidatorImpl implements TicketValidator {
      * @throws InvalidPurchaseException Thrown with an appropriate error message if validation fails.
      */
     @Override
-    public void validateTicketRequest(Long accountId, List<TicketTypeRequest> ticketTypeRequests) throws InvalidPurchaseException {
+    public void validateTicketRequest(Long accountId, TicketTypeRequest... ticketTypeRequests) throws InvalidPurchaseException {
         validateAccountId(accountId);
+        validateNullTicketTypeRequests(ticketTypeRequests);
         validateTicketRequestType(ticketTypeRequests);
         validateTicketIndividualRequestCount(ticketTypeRequests);
         validateTicketTotalRequestCount(ticketTypeRequests);
@@ -30,8 +32,8 @@ public class TicketValidatorImpl implements TicketValidator {
         }
     }
 
-    private void validateTicketTotalRequestCount(List<TicketTypeRequest> ticketTypeRequests) throws InvalidPurchaseException {
-        int totalTickets = ticketTypeRequests.stream()
+    private void validateTicketTotalRequestCount(TicketTypeRequest... ticketTypeRequests) throws InvalidPurchaseException {
+        int totalTickets = Arrays.stream(ticketTypeRequests)
                 .mapToInt(TicketTypeRequest::getNoOfTickets)
                 .sum();
 
@@ -39,7 +41,7 @@ public class TicketValidatorImpl implements TicketValidator {
             throw new InvalidPurchaseException("Total requested tickets must be between 1 and 20");
         }
 
-        long adultTickets = ticketTypeRequests.stream()
+        long adultTickets = Arrays.stream(ticketTypeRequests)
                 .filter(ticketTypeRequest -> ticketTypeRequest.getTicketType().equals(TicketTypeRequest.Type.ADULT))
                 .count();
 
@@ -48,8 +50,8 @@ public class TicketValidatorImpl implements TicketValidator {
         }
     }
 
-    private void validateTicketIndividualRequestCount(List<TicketTypeRequest> ticketTypeRequests) throws InvalidPurchaseException {
-        long negativeTicketCount = ticketTypeRequests.stream()
+    private void validateTicketIndividualRequestCount(TicketTypeRequest... ticketTypeRequests) throws InvalidPurchaseException {
+        long negativeTicketCount = Arrays.stream(ticketTypeRequests)
                 .map(TicketTypeRequest::getNoOfTickets)
                 .filter(ticketNum -> ticketNum <= 0)
                 .count();
@@ -59,8 +61,14 @@ public class TicketValidatorImpl implements TicketValidator {
         }
     }
 
-    private void validateTicketRequestType(List<TicketTypeRequest> ticketTypeRequests) throws InvalidPurchaseException {
-        long nullTicketType = ticketTypeRequests.stream()
+    private void validateNullTicketTypeRequests(TicketTypeRequest... ticketTypeRequests) throws InvalidPurchaseException {
+        if (ticketTypeRequests == null || Arrays.stream(ticketTypeRequests).anyMatch(Objects::isNull)) {
+            throw new InvalidPurchaseException("Ticket requests must not be null");
+        }
+    }
+
+    private void validateTicketRequestType(TicketTypeRequest... ticketTypeRequests) throws InvalidPurchaseException {
+        long nullTicketType = Arrays.stream(ticketTypeRequests)
                 .filter(ticketTypeRequest -> ticketTypeRequest.getTicketType() == null)
                 .count();
 

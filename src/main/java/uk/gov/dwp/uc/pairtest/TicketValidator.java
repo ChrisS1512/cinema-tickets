@@ -10,5 +10,5 @@ import java.util.List;
  */
 public interface TicketValidator {
 
-    void validateTicketRequest(Long accountId, List<TicketTypeRequest> ticketTypeRequests) throws InvalidPurchaseException;
+    void validateTicketRequest(Long accountId, TicketTypeRequest... ticketTypeRequests) throws InvalidPurchaseException;
 }
